@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calculatrice</title>
+<style>
+body {
+    background: #1c1c1c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial;
+}
+
+.calculator {
+    background: black;
+    padding: 20px;
+    border-radius: 20px;
+    width: 260px;
+}
+
+.display {
+    color: white;
+    font-size: 2.5em;
+    text-align: right;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button {
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.gray { background: #a5a5a5; }
+.dark { background: #333; color: white; }
+.orange { background: orange; color: white; }
+
+.zero {
+    grid-column: span 2;
+    border-radius: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+    <div class="display" id="display">0</div>
+
+    <div class="buttons">
+        <button class="gray" onclick="clearDisplay()">AC</button>
+        <button class="gray" onclick="toggleSign()">±</button>
+        <button class="gray" onclick="percentage()">%</button>
+        <button class="orange" onclick="chooseOperator('/')">÷</button>
+
+        <button class="dark" onclick="appendNumber(7)">7</button>
+        <button class="dark" onclick="appendNumber(8)">8</button>
+        <button class="dark" onclick="appendNumber(9)">9</button>
+        <button class="orange" onclick="chooseOperator('*')">×</button>
+
+        <button class="dark" onclick="appendNumber(4)">4</button>
+        <button class="dark" onclick="appendNumber(5)">5</button>
+        <button class="dark" onclick="appendNumber(6)">6</button>
+        <button class="orange" onclick="chooseOperator('-')">−</button>
+
+        <button class="dark" onclick="appendNumber(1)">1</button>
+        <button class="dark" onclick="appendNumber(2)">2</button>
+        <button class="dark" onclick="appendNumber(3)">3</button>
+        <button class="orange" onclick="chooseOperator('+')">+</button>
+
+        <button class="dark zero" onclick="appendNumber(0)">0</button>
+        <button class="dark" onclick="appendDot()">.</button>
+        <button class="orange" onclick="calculate()">=</button>
+
+        <button class="gray" onclick="square()">x²</button>
+        <button class="gray" onclick="cube()">x³</button>
+    </div>
+</div>
+
+<script>
+let current = "0";
+let previous = null;
+let operator = null;
+
+function updateDisplay() {
+    document.getElementById("display").innerText = current;
+}
+
+function appendNumber(num) {
+    if (current === "0") {
+        current = num.toString();
+    } else {
+        current += num;
+    }
+    updateDisplay();
+}
+
+function appendDot() {
+    if (!current.includes(".")) {
+        current += ".";
+    }
+    updateDisplay();
+}
+
+function square() {
+    let value = parseFloat(current);
+    current = (value * value).toString();
+    updateDisplay();
+}
+
+function cube() {
+    let value = parseFloat(current);
+    current = (value * value * value).toString();
+    updateDisplay();
+}
+
+function clearDisplay() {
+    current = "0";
+    previous = null;
+    operator = null;
+    updateDisplay();
+}
+
+function toggleSign() {
+    current = (parseFloat(current) * -1).toString();
+    updateDisplay();
+}
+
+function percentage() {
+    current = (parseFloat(current) / 100).toString();
+    updateDisplay();
+}
+
+function chooseOperator(op) {
+    previous = parseFloat(current);
+    operator = op;
+    current = "0";
+}
+
+function calculate() {
+    let result;
+    let prev = previous;
+    let curr = parseFloat(current);
+
+    if (operator === "+") result = prev + curr;
+    if (operator === "-") result = prev - curr;
+    if (operator === "*") result = prev * curr;
+    if (operator === "/") {
+        if (curr === 0) {
+            current = "Erreur";
+            updateDisplay();
+            return;
+        }
+        result = prev / curr;
+    }
+
+    current = result.toString();
+    operator = null;
+    previous = null;
+    updateDisplay();
+}
+
+document.addEventListener("keydown", function(event) {
+    const key = event.key;
+  
+    if (key === " ") return;
+    
+    if (!isNaN(key)) {
+        appendNumber(key);
+    } else if (key === ".") {
+        appendDot();
+    } else if (key === "+" || key === "-" || key === "*" || key === "/") {
+        chooseOperator(key);
+    } else if (key === "Enter") {
+        calculate();
+    } else if (key === "Backspace") {
+        current = current.slice(0, -1) || "0";
+        updateDisplay();
+    } else if (key === "Escape") {
+        clearDisplay();
+    }
+});
+</script>
+
+</body>
+</html>
